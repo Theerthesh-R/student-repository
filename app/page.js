@@ -4,64 +4,50 @@ import { supabase } from "./lib/supabase";
 
 export default function Home() {
   const [studentList, setStudentList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadStudentList();
   }, []);
 
   async function loadStudentList() {
-    setLoading(true);
-    setError(null);
-    
     const { data, error } = await supabase.from("Student").select();
 
     if (error) {
-      setError("Failed to fetch students. Please try again later.");
-      setLoading(false);
+      alert("Error fetching students: " + JSON.stringify(error));
       return;
     }
-    
     setStudentList(data);
-    setLoading(false);
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Student List</h1>
+    <div className="min-h-screen flex flex-col items-center p-6">
+      <h1 className="text-3xl font-bold mb-4">Student List</h1>
 
-      {loading ? (
-        <p className="text-lg text-gray-600">Loading students...</p>
-      ) : error ? (
-        <p className="text-lg text-red-500">{error}</p>
-      ) : studentList.length === 0 ? (
-        <p className="text-lg text-gray-600">No students found.</p>
+      {studentList.length === 0 ? (
+        <p>No students found.</p>
       ) : (
-        <div className="w-full max-w-4xl overflow-x-auto">
-          <table className="w-full border border-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
-            <thead>
-              <tr className="bg-blue-500 text-white">
-                <th className="p-3 border">USN</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">Phone</th>
-                <th className="p-3 border">Email</th>
-                <th className="p-3 border">Gender</th>
+        <table className="border-collapse border border-gray-300 w-full max-w-2xl">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">USN</th>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Phone</th>
+              <th className="border p-2">Email</th>
+              <th className="border p-2">Gender</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentList.map((student) => (
+              <tr key={student.usn} className="text-center">
+                <td className="border p-2">{student.usn}</td>
+                <td className="border p-2">{student.name}</td>
+                <td className="border p-2">{student.phone}</td>
+                <td className="border p-2">{student.email}</td>
+                <td className="border p-2">{student.gender}</td>
               </tr>
-            </thead>
-            <tbody>
-              {studentList.map((student, index) => (
-                <tr key={student.usn} className={`text-center ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
-                  <td className="p-3 border">{student.usn}</td>
-                  <td className="p-3 border">{student.name}</td>
-                  <td className="p-3 border">{student.phone}</td>
-                  <td className="p-3 border">{student.email}</td>
-                  <td className="p-3 border">{student.gender}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
